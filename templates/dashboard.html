@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard - Fraud Detection</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00d4ff;
+            --bg-gradient: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-color: white;
+            --error-color: #ff4444;
+            --success-color: #00C851;
+        }
+
+        body {
+            background: var(--bg-gradient), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        body[data-theme="light"] {
+            --bg-gradient: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9));
+            --card-bg: rgba(0,0,0,0.05);
+            --text-color: #000;
+            --primary-color: #0066cc;
+        }
+
+        body[data-theme="cyber"] {
+            --bg-gradient: linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.95));
+            --card-bg: rgba(0,255,0,0.1);
+            --text-color: #0f0;
+            --primary-color: #00ff00;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            animation: slideDown 0.5s ease;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-color);
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--primary-color);
+            animation: glowPulse 2s infinite;
+            font-size: 2.5rem;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { text-shadow: 0 0 10px var(--primary-color); }
+            50% { text-shadow: 0 0 20px var(--primary-color); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            text-align: center;
+            transition: all 0.3s ease;
+            animation: slideInUp 0.5s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px var(--primary-color);
+            background: rgba(0, 212, 255, 0.15);
+        }
+
+        .stat-card.pulse-animation {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); background: rgba(0,212,255,0.2); }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            margin-bottom: 30px;
+            animation: slideInUp 0.6s ease;
+        }
+
+        .chart-container h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        canvas {
+            max-height: 400px;
+            width: 100% !important;
+        }
+
+        /* Achievements Section */
+        .achievement-badges {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--primary-color);
+            animation: slideInUp 0.7s ease;
+        }
+
+        .achievement-badges h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .badges-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .badge {
+            background: rgba(0,212,255,0.1);
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .badge.unlocked {
+            background: rgba(0,212,255,0.3);
+            animation: unlockPulse 1s ease;
+        }
+
+        .badge.locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .badge.locked .badge-progress {
+            display: none;
+        }
+
+        .badge:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--primary-color);
+        }
+
+        .badge-icon {
+            font-size: 40px;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .badge-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .badge-progress {
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .badge-progress .progress {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 1s ease;
+        }
+
+        .badge-locked {
+            font-size: 12px;
+            color: var(--error-color);
+            margin-top: 10px;
+        }
+
+        @keyframes unlockPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); box-shadow: 0 0 50px var(--primary-color); }
+        }
+
+        /* Transactions Table */
+        .transactions-table {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            overflow-x: auto;
+            animation: slideInUp 0.8s ease;
+        }
+
+        .transactions-table h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: black;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+        }
+
+        tbody tr {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: rgba(0,212,255,0.2);
+            transform: scale(1.01);
+            box-shadow: 0 5px 15px rgba(0,212,255,0.3);
+        }
+
+        .fraud-badge {
+            background: var(--error-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+            animation: shake 0.5s ease;
+        }
+
+        .legit-badge {
+            background: var(--success-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .no-transactions {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .no-transactions a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            display: inline-block;
+            padding: 10px 20px;
+            border: 2px solid var(--primary-color);
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .no-transactions a:hover {
+            background: var(--primary-color);
+            color: black;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+            max-width: 500px;
+            width: 90%;
+            animation: slideInUp 0.3s ease;
+            position: relative;
+        }
+
+        .modal-content h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--primary-color);
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: scale(1.2);
+            color: var(--error-color);
+        }
+
+        .modal-content p {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .modal-content strong {
+            color: var(--primary-color);
+        }
+
+        /* Flash Messages */
+        .flash {
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            font-weight: bold;
+        }
+
+        .flash.success {
+            background: rgba(0, 200, 81, 0.3);
+            border: 2px solid var(--success-color);
+            color: var(--text-color);
+        }
+
+        .flash.error {
+            background: rgba(255, 68, 68, 0.3);
+            border: 2px solid var(--error-color);
+            color: var(--text-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 30px;
+            border: 1px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+        }
+
+        .theme-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: var(--text-color);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .theme-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: black;
+        }
+
+        /* Keyboard Help */
+        .keyboard-help {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .keyboard-help h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .keyboard-help ul {
+            list-style: none;
+        }
+
+        .keyboard-help li {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .keyboard-help li kbd {
+            background: var(--primary-color);
+            color: black;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .nav-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .nav-links {
+                justify-content: center;
+            }
+
+            .stat-value {
+                font-size: 28px;
+            }
+
+            .badges-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+
+            .badge-icon {
+                font-size: 30px;
+            }
+
+            .badge-name {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px;
+                font-size: 0.9rem;
+            }
+
+            .theme-switcher {
+                top: 10px;
+                right: 10px;
+            }
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')" title="Dark Theme">🌙</button>
+        <button class="theme-btn" data-theme="light" onclick="setTheme('light')" title="Light Theme">☀️</button>
+        <button class="theme-btn" data-theme="cyber" onclick="setTheme('cyber')" title="Cyber Theme">💻</button>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <div class="nav-links">
+                <a href="/" class="nav-link">🏠 HOME</a>
+                <a href="/dashboard" class="nav-link">📊 DASHBOARD</a>
+                <a href="/chatbot" class="nav-link">🤖 CHATBOT</a>
+                <a href="/profile" class="nav-link">👤 PROFILE</a>
+            </div>
+            <a href="/logout" class="nav-link">🚪 LOGOUT</a>
+        </div>
+        
+        <h1>📊 TRANSACTION DASHBOARD</h1>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card" onclick="showStatDetail('total')">
+                <div class="stat-label">Total Transactions</div>
+                <div class="stat-value" id="totalTransactions">{{ total_transactions }}</div>
+            </div>
+            <div class="stat-card" onclick="showStatDetail('fraud')">
+                <div class="stat-label">Fraud Detected</div>
+                <div class="stat-value" id="fraudCount">{{ fraud_count }}</div>
+            </div>
+            <div class="stat-card" onclick="showStatDetail('percentage')">
+                <div class="stat-label">Fraud Percentage</div>
+                <div class="stat-value" id="fraudPercentage">{{ fraud_percentage }}%</div>
+            </div>
+            <div class="stat-card" onclick="showStatDetail('amount')">
+                <div class="stat-label">Total Amount</div>
+                <div class="stat-value" id="totalAmount">${{ total_amount }}</div>
+            </div>
+        </div>
+        
+        <!-- Chart Container -->
+        {% if transactions and transactions|length > 0 %}
+        <div class="chart-container">
+            <h3>📈 Recent Transaction Amounts</h3>
+            <canvas id="transactionChart"></canvas>
+        </div>
+        {% endif %}
+        
+        <!-- Achievements Section -->
+        <div class="achievement-badges">
+            <h3>🏆 ACHIEVEMENTS</h3>
+            <div class="badges-container" id="achievements">
+                <div class="badge {% if total_transactions > 0 %}unlocked{% else %}locked{% endif %}" data-achievement="first">
+                    <div class="badge-icon">🔍</div>
+                    <div class="badge-name">First Analysis</div>
+                    <div class="badge-progress">
+                        <div class="progress" style="width: {% if total_transactions > 0 %}100{% else %}0{% endif %}%"></div>
+                    </div>
+                </div>
+                
+                <div class="badge {% if fraud_count >= 5 %}unlocked{% else %}locked{% endif %}" data-achievement="hunter">
+                    <div class="badge-icon">🛡️</div>
+                    <div class="badge-name">Fraud Hunter</div>
+                    <div class="badge-progress">
+                        <div class="progress" style="width: {{ (fraud_count / 5 * 100)|round if fraud_count < 5 else 100 }}%"></div>
+                    </div>
+                    {% if fraud_count < 5 %}
+                        <div class="badge-locked">{{ 5 - fraud_count }} more to unlock</div>
+                    {% endif %}
+                </div>
+                
+                <div class="badge {% if total_transactions >= 10 %}unlocked{% else %}locked{% endif %}" data-achievement="expert">
+                    <div class="badge-icon">🏆</div>
+                    <div class="badge-name">Expert Analyst</div>
+                    <div class="badge-progress">
+                        <div class="progress" style="width: {{ (total_transactions / 10 * 100)|round if total_transactions < 10 else 100 }}%"></div>
+                    </div>
+                    {% if total_transactions < 10 %}
+                        <div class="badge-locked">{{ 10 - total_transactions }} more to unlock</div>
+                    {% endif %}
+                </div>
+                
+                <div class="badge {% if fraud_count > 0 %}unlocked{% else %}locked{% endif %}" data-achievement="detector">
+                    <div class="badge-icon">🎯</div>
+                    <div class="badge-name">Fraud Detector</div>
+                    <div class="badge-progress">
+                        <div class="progress" style="width: {% if fraud_count > 0 %}100{% else %}0{% endif %}%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Transactions Table -->
+        <div class="transactions-table">
+            <h3>📋 RECENT TRANSACTIONS</h3>
+            
+            {% if transactions and transactions|length > 0 %}
+            <!-- Search Box -->
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search transactions by type, amount, result..." onkeyup="searchTransactions()">
+            </div>
+            
+            <table id="transactionsTable">
+                <thead>
+                    <tr>
+                        <th>Date & Time</th>
+                        <th>Type</th>
+                        <th>Amount</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr onclick="showTransactionDetails('{{ t[0] }}', '{{ t[1] }}', '{{ t[2] }}', '{{ t[3] }}')">
+                        <td>{{ t[3][:19] if t[3] else 'N/A' }}</td>
+                        <td>{{ t[0] }}</td>
+                        <td>${{ "{:,.2f}".format(t[1]) }}</td>
+                        <td>
+                            {% if 'Fraud' in t[2] %}
+                                <span class="fraud-badge">{{ t[2] }}</span>
+                            {% else %}
+                                <span class="legit-badge">{{ t[2] }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="no-transactions">
+                <p>📭 No transactions yet. Start by analyzing some payments!</p>
+                <a href="/">🔍 ANALYZE YOUR FIRST TRANSACTION</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // THEME SWITCHER
+        // ============================================
+        function setTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('theme', themeName);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                if (btn.dataset.theme === themeName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Update chart colors if chart exists
+            if (window.transactionChart) {
+                updateChartTheme();
+            }
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+
+        // ============================================
+        // CHART INITIALIZATION
+        // ============================================
+        {% if transactions and transactions|length > 0 %}
+        const ctx = document.getElementById('transactionChart').getContext('2d');
+        let transactionChart;
+
+        function initChart() {
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color').trim();
+            const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim();
+            
+            transactionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [{
+                        label: 'Transaction Amount ($)',
+                        data: {{ chart_data|safe }},
+                        borderColor: primaryColor,
+                        backgroundColor: primaryColor + '20',
+                        tension: 0.4,
+                        pointBackgroundColor: primaryColor,
+                        pointBorderColor: textColor,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: primaryColor,
+                        pointHoverBorderColor: textColor,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: textColor,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            titleColor: primaryColor,
+                            bodyColor: textColor,
+                            borderColor: primaryColor,
+                            borderWidth: 2,
+                            padding: 10,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return `Amount: $${context.raw.toFixed(2)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            },
+                            grid: {
+                                color: textColor + '20'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: textColor,
+                                maxRotation: 45,
+                                minRotation: 45
+                            },
+                            grid: {
+                                color: textColor + '20'
+                            }
+                        }
+                    },
+                    onClick: function(e, elements) {
+                        if (elements.length > 0) {
+                            const index = elements[0].index;
+                            showChartPointDetails(index);
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateChartTheme() {
+            const textColor = getComputedStyle(document.body).getPropertyValue('--text-color').trim();
+            const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary-color').trim();
+            
+            transactionChart.options.plugins.legend.labels.color = textColor;
+            transactionChart.options.scales.y.ticks.color = textColor;
+            transactionChart.options.scales.x.ticks.color = textColor;
+            transactionChart.options.scales.y.grid.color = textColor + '20';
+            transactionChart.options.scales.x.grid.color = textColor + '20';
+            transactionChart.data.datasets[0].borderColor = primaryColor;
+            transactionChart.data.datasets[0].backgroundColor = primaryColor + '20';
+            transactionChart.update();
+        }
+
+        // Initialize chart when page loads
+        window.addEventListener('load', initChart);
+        {% endif %}
+
+        // ============================================
+        // REAL-TIME UPDATES
+        // ============================================
+        let updateInterval;
+
+        function startRealTimeUpdates() {
+            updateInterval = setInterval(() => {
+                fetch('/api/dashboard-stats')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.error) {
+                            document.getElementById('totalTransactions').textContent = data.total_transactions;
+                            document.getElementById('fraudCount').textContent = data.fraud_count;
+                            document.getElementById('fraudPercentage').textContent = data.fraud_percentage + '%';
+                            document.getElementById('totalAmount').textContent = '$' + data.total_amount;
+                            animateValueChanges();
+                        }
+                    })
+                    .catch(error => console.log('Real-time update error:', error));
+            }, 30000); // Update every 30 seconds
+        }
+
+        function animateValueChanges() {
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.classList.add('pulse-animation');
+                setTimeout(() => card.classList.remove('pulse-animation'), 500);
+            });
+        }
+
+        // Start real-time updates if user has transactions
+        {% if total_transactions > 0 %}
+        startRealTimeUpdates();
+        {% endif %}
+
+        // ============================================
+        // ACHIEVEMENT SYSTEM
+        // ============================================
+        function checkAchievements() {
+            const achievements = {
+                'first': {{ total_transactions }} > 0,
+                'hunter': {{ fraud_count }} >= 5,
+                'expert': {{ total_transactions }} >= 10,
+                'detector': {{ fraud_count }} > 0
+            };
+            
+            Object.keys(achievements).forEach(key => {
+                const badge = document.querySelector(`[data-achievement="${key}"]`);
+                if (badge && achievements[key] && badge.classList.contains('locked')) {
+                    unlockAchievement(badge, key);
+                }
+            });
+        }
+
+        function unlockAchievement(badge, achievementName) {
+            badge.classList.remove('locked');
+            badge.classList.add('unlocked');
+            
+            // Confetti effect
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#00d4ff', '#ffffff', '#ffd700']
+            });
+            
+            // Show achievement message
+            showAchievementMessage(`🏆 Achievement Unlocked: ${badge.querySelector('.badge-name').textContent}`);
+        }
+
+        function showAchievementMessage(message) {
+            const msg = document.createElement('div');
+            msg.className = 'flash success';
+            msg.style.position = 'fixed';
+            msg.style.top = '80px';
+            msg.style.left = '50%';
+            msg.style.transform = 'translateX(-50%)';
+            msg.style.zIndex = '2000';
+            msg.style.animation = 'slideDown 0.5s ease';
+            msg.style.boxShadow = '0 5px 20px rgba(0,212,255,0.3)';
+            msg.textContent = message;
+            document.body.appendChild(msg);
+            
+            setTimeout(() => msg.remove(), 3000);
+        }
+
+        // Check achievements on load
+        window.addEventListener('load', checkAchievements);
+
+        // ============================================
+        // SEARCH FUNCTIONALITY
+        // ============================================
+        function searchTransactions() {
+            const input = document.getElementById('searchInput');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('transactionsTable');
+            const tr = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < tr.length; i++) {
+                const tdArray = tr[i].getElementsByTagName('td');
+                let found = false;
+                
+                for (let j = 0; j < tdArray.length; j++) {
+                    const td = tdArray[j];
+                    if (td) {
+                        const txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                tr[i].style.display = found ? '' : 'none';
+            }
+        }
+
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        function showStatDetail(type) {
+            let title, content;
+            
+            switch(type) {
+                case 'total':
+                    title = '📊 Total Transactions';
+                    content = `You have analyzed <strong>{{ total_transactions }}</strong> transactions in total.`;
+                    break;
+                case 'fraud':
+                    title = '🚨 Fraud Detected';
+                    content = `Found <strong>{{ fraud_count }}</strong> fraudulent transactions out of <strong>{{ total_transactions }}</strong> total.`;
+                    break;
+                case 'percentage':
+                    title = '📈 Fraud Percentage';
+                    content = `<strong>{{ fraud_percentage }}%</strong> of your transactions were flagged as fraudulent.`;
+                    break;
+                case 'amount':
+                    title = '💰 Total Amount';
+                    content = `Total transaction amount: <strong>${{ total_amount }}</strong>`;
+                    break;
+            }
+            
+            showModal(title, content);
+        }
+
+        function showTransactionDetails(type, amount, result, date) {
+            const title = '📝 Transaction Details';
+            const content = `
+                <p><strong>Type:</strong> ${type}</p>
+                <p><strong>Amount:</strong> $${parseFloat(amount).toFixed(2)}</p>
+                <p><strong>Result:</strong> ${result}</p>
+                <p><strong>Date:</strong> ${date}</p>
+            `;
+            showModal(title, content);
+        }
+
+        function showChartPointDetails(index) {
+            const labels = {{ chart_labels|safe }};
+            const data = {{ chart_data|safe }};
+            
+            showModal('📈 Transaction Details', `
+                <p><strong>Date:</strong> ${labels[index]}</p>
+                <p><strong>Amount:</strong> $${data[index].toFixed(2)}</p>
+            `);
+        }
+
+        function showModal(title, content) {
+            // Remove existing modal
+            const existingModal = document.querySelector('.modal');
+            if (existingModal) existingModal.remove();
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+                    <h3>${title}</h3>
+                    <div>${content}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Close on click outside
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            });
+            
+            // Close on Escape key
+            const escHandler = function(e) {
+                if (e.key === 'Escape') {
+                    modal.remove();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
+        }
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + N for home
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                window.location.href = '/';
+            }
+            // Ctrl + D for dashboard
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                window.location.href = '/dashboard';
+            }
+            // Ctrl + C for chatbot
+            if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                window.location.href = '/chatbot';
+            }
+            // Ctrl + P for profile
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.location.href = '/profile';
+            }
+            // ? for help
+            if (e.key === '?' && !e.ctrlKey && !e.altKey) {
+                e.preventDefault();
+                showKeyboardHelp();
+            }
+            // Esc to close help or modal
+            if (e.key === 'Escape') {
+                const help = document.querySelector('.keyboard-help');
+                if (help) help.remove();
+                const modal = document.querySelector('.modal');
+                if (modal) modal.remove();
+            }
+            // Ctrl + F to focus search
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+        });
+
+        function showKeyboardHelp() {
+            // Remove existing help
+            const existingHelp = document.querySelector('.keyboard-help');
+            if (existingHelp) existingHelp.remove();
+            
+            const help = document.createElement('div');
+            help.className = 'keyboard-help';
+            help.innerHTML = `
+                <h3>⌨️ Dashboard Shortcuts</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> + <kbd>N</kbd> - Home</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Dashboard</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Chatbot</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>P</kbd> - Profile</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>F</kbd> - Search</li>
+                    <li><kbd>?</kbd> - Show help</li>
+                    <li><kbd>Esc</kbd> - Close</li>
+                </ul>
+            `;
+            document.body.appendChild(help);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (help.parentNode) help.remove();
+            }, 10000);
+        }
+    </script>
+</body>
+</html>

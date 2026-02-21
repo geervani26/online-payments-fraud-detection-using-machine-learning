@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile - Fraud Detection</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00d4ff;
+            --bg-gradient: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6));
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --text-color: white;
+            --error-color: #ff4444;
+            --success-color: #00C851;
+            --input-bg: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            background: var(--bg-gradient), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover;
+            background-attachment: fixed;
+            font-family: 'Segoe UI', sans-serif;
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body[data-theme="light"] {
+            --bg-gradient: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9));
+            --card-bg: rgba(0,0,0,0.05);
+            --text-color: #000;
+            --primary-color: #0066cc;
+            --input-bg: rgba(255,255,255,0.9);
+        }
+
+        body[data-theme="cyber"] {
+            --bg-gradient: linear-gradient(rgba(0,0,0,0.95), rgba(0,0,0,0.95));
+            --card-bg: rgba(0,255,0,0.1);
+            --text-color: #0f0;
+            --primary-color: #00ff00;
+            --input-bg: rgba(0,0,0,0.8);
+        }
+
+        .profile-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid var(--primary-color);
+            width: 550px;
+            max-width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            position: relative;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            animation: slideDown 0.5s ease;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-color);
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        h2 {
+            text-align: center;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--primary-color);
+            animation: glow 2s infinite;
+            font-size: 2rem;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px var(--primary-color); }
+            50% { text-shadow: 0 0 20px var(--primary-color); }
+        }
+
+        /* Profile Header */
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            border: 1px solid var(--primary-color);
+            animation: slideInLeft 0.6s ease;
+            flex-wrap: wrap;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: black;
+            box-shadow: 0 0 20px var(--primary-color);
+            animation: rotateIn 0.8s ease;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes rotateIn {
+            from {
+                opacity: 0;
+                transform: rotate(-180deg) scale(0.3);
+            }
+            to {
+                opacity: 1;
+                transform: rotate(0) scale(1);
+            }
+        }
+
+        .avatar:hover {
+            animation: bounce 0.5s ease;
+            transform: scale(1.05);
+            box-shadow: 0 0 30px var(--primary-color);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .profile-header h3 {
+            color: var(--primary-color);
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        /* User ID Section */
+        .user-id-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            background: rgba(0,0,0,0.3);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--primary-color);
+        }
+
+        .user-id-label {
+            font-size: 12px;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-id-value {
+            font-family: monospace;
+            font-size: 14px;
+            background: rgba(0,0,0,0.5);
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: var(--primary-color);
+        }
+
+        /* Copy Button - FIXED */
+        .copy-btn {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-color);
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px var(--primary-color);
+        }
+
+        .copy-btn.copied {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: black;
+        }
+
+        /* Info Items */
+        .info-item {
+            margin-bottom: 15px;
+            padding: 15px 20px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px solid transparent;
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .info-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,212,255,0.2);
+            background: rgba(0,212,255,0.05);
+        }
+
+        .info-label {
+            color: var(--primary-color);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            word-break: break-word;
+        }
+
+        /* Edit Form */
+        .edit-form {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 15px;
+            border: 2px dashed var(--primary-color);
+            animation: slideInUp 0.7s ease;
+        }
+
+        .edit-form h3 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #666;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            background: transparent;
+            padding: 0 5px;
+        }
+
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: var(--primary-color);
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 3px;
+            padding: 2px 8px;
+        }
+
+        /* Button Styles */
+        button {
+            width: 100%;
+            padding: 15px;
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--primary-color);
+            color: black;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px var(--primary-color);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Flash Messages */
+        .flash {
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+            font-weight: bold;
+        }
+
+        .flash.success {
+            background: rgba(0, 200, 81, 0.3);
+            border: 2px solid var(--success-color);
+            color: var(--text-color);
+        }
+
+        .flash.error {
+            background: rgba(255, 68, 68, 0.3);
+            border: 2px solid var(--error-color);
+            color: var(--text-color);
+        }
+
+        .flash.info {
+            background: rgba(0, 212, 255, 0.3);
+            border: 2px solid var(--primary-color);
+            color: var(--text-color);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Theme Switcher */
+        .theme-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: 30px;
+            border: 1px solid var(--primary-color);
+            backdrop-filter: blur(10px);
+            animation: slideDown 0.5s ease;
+        }
+
+        .theme-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: var(--text-color);
+            padding: 0;
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .theme-btn.active {
+            border-color: var(--primary-color);
+            background: var(--primary-color);
+            color: black;
+        }
+
+        /* Keyboard Help */
+        .keyboard-help {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-color);
+            border-radius: 10px;
+            padding: 20px;
+            max-width: 300px;
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        .keyboard-help h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .keyboard-help ul {
+            list-style: none;
+        }
+
+        .keyboard-help li {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .keyboard-help li kbd {
+            background: var(--primary-color);
+            color: black;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        /* Loading Animation */
+        .custom-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .loader-content {
+            text-align: center;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 15px;
+            border: 2px solid var(--primary-color);
+        }
+
+        .loader-content .spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: var(--primary-color);
+            color: black;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: bold;
+            pointer-events: none;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .profile-container {
+                padding: 20px;
+            }
+            
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .nav-menu {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-links {
+                justify-content: center;
+            }
+            
+            .theme-switcher {
+                top: 10px;
+                right: 10px;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .avatar {
+                width: 80px;
+                height: 80px;
+                font-size: 36px;
+            }
+
+            .user-id-section {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .copy-btn {
+                margin-left: 0;
+                margin-top: 5px;
+            }
+        }
+
+        /* Particle Effect */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleFly 1s ease-out forwards;
+        }
+
+        @keyframes particleFly {
+            0% {
+                transform: translate(0, 0);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+            }
+        }
+
+        /* Success Message */
+        .copy-success {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success-color);
+            color: black;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 5px 20px var(--success-color);
+            animation: slideDown 0.3s ease;
+            z-index: 2000;
+        }
+    </style>
+</head>
+<body data-theme="dark">
+    <!-- Theme Switcher -->
+    <div class="theme-switcher">
+        <button class="theme-btn" data-theme="dark" onclick="setTheme('dark')" title="Dark Theme">🌙</button>
+        <button class="theme-btn" data-theme="light" onclick="setTheme('light')" title="Light Theme">☀️</button>
+        <button class="theme-btn" data-theme="cyber" onclick="setTheme('cyber')" title="Cyber Theme">💻</button>
+    </div>
+
+    <div class="profile-container">
+        <!-- Navigation Menu -->
+        <div class="nav-menu">
+            <div class="nav-links">
+                <a href="/" class="nav-link">🏠 HOME</a>
+                <a href="/dashboard" class="nav-link">📊 DASHBOARD</a>
+                <a href="/chatbot" class="nav-link">🤖 CHATBOT</a>
+            </div>
+            <a href="/logout" class="nav-link">🚪 LOGOUT</a>
+        </div>
+        
+        <h2>👤 USER PROFILE</h2>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="avatar" id="avatar">
+                {{ user[0][0]|upper if user and user[0] else 'U' }}
+            </div>
+            <div style="flex: 1;">
+                <h3 id="displayName">{{ user[2] or user[0] }}</h3>
+                <p style="opacity: 0.8; margin-bottom: 10px;">Member since: <span id="memberSince">{{ user[3][:10] if user and user[3] else 'N/A' }}</span></p>
+                
+                <!-- User ID Section with Copy Button - FIXED -->
+                <div class="user-id-section">
+                    <span class="user-id-label">User ID:</span>
+                    <span class="user-id-value" id="userId">{{ session.user_id }}</span>
+                    <button class="copy-btn tooltip" id="copyUserIdBtn" onclick="copyUserId()">
+                        <span class="tooltiptext" id="copyTooltip">Copy to clipboard</span>
+                        📋 COPY ID
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Items -->
+        <div class="info-item">
+            <div class="info-label">Username</div>
+            <div class="info-value" id="username">{{ user[0] }}</div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value" id="email">{{ user[1] or 'Not provided' }}</div>
+        </div>
+        
+        <div class="info-item">
+            <div class="info-label">Full Name</div>
+            <div class="info-value" id="fullName">{{ user[2] or 'Not provided' }}</div>
+        </div>
+        
+        <!-- Edit Form -->
+        <div class="edit-form">
+            <h3>✏️ EDIT PROFILE</h3>
+            <form action="/update_profile" method="POST" id="profileForm" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <input type="email" name="email" id="emailInput" value="{{ user[1] or '' }}" required>
+                    <label for="emailInput">Email Address</label>
+                </div>
+                
+                <div class="form-group">
+                    <input type="text" name="full_name" id="fullNameInput" value="{{ user[2] or '' }}" required>
+                    <label for="fullNameInput">Full Name</label>
+                </div>
+                
+                <button type="submit" id="updateBtn" onclick="createParticleEffect(event)">
+                    🔄 UPDATE PROFILE
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // THEME SWITCHER
+        // ============================================
+        function setTheme(themeName) {
+            document.body.setAttribute('data-theme', themeName);
+            localStorage.setItem('theme', themeName);
+            
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                if (btn.dataset.theme === themeName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        setTheme(savedTheme);
+
+        // ============================================
+        // COPY USER ID FUNCTIONALITY - FIXED
+        // ============================================
+        function copyUserId() {
+            // Get the user ID from the span element
+            const userIdElement = document.getElementById('userId');
+            const userId = userIdElement.textContent.trim();
+            
+            // Get the button and tooltip
+            const copyBtn = document.getElementById('copyUserIdBtn');
+            const tooltip = document.getElementById('copyTooltip');
+            
+            // Use the modern clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(userId).then(function() {
+                    // Success - show feedback
+                    showCopySuccess(userId);
+                    
+                    // Change button text temporarily
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '✅ COPIED!';
+                    copyBtn.classList.add('copied');
+                    tooltip.textContent = 'Copied!';
+                    
+                    // Reset after 2 seconds
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.classList.remove('copied');
+                        tooltip.textContent = 'Copy to clipboard';
+                    }, 2000);
+                    
+                }).catch(function(err) {
+                    // Fallback for older browsers
+                    fallbackCopy(userId);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopy(userId);
+            }
+        }
+
+        // Fallback copy method for older browsers
+        function fallbackCopy(text) {
+            // Create temporary textarea
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            
+            // Select and copy
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showCopySuccess(text);
+                    
+                    const copyBtn = document.getElementById('copyUserIdBtn');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '✅ COPIED!';
+                    copyBtn.classList.add('copied');
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = originalText;
+                        copyBtn.classList.remove('copied');
+                    }, 2000);
+                } else {
+                    alert('Press Ctrl+C to copy: ' + text);
+                }
+            } catch (err) {
+                alert('Press Ctrl+C to copy: ' + text);
+            }
+            
+            // Clean up
+            document.body.removeChild(textarea);
+        }
+
+        // Show success message
+        function showCopySuccess(userId) {
+            // Create success message
+            const successMsg = document.createElement('div');
+            successMsg.className = 'copy-success';
+            successMsg.innerHTML = `✅ User ID copied to clipboard! <small style="opacity:0.8">(${userId})</small>`;
+            document.body.appendChild(successMsg);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                successMsg.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => successMsg.remove(), 300);
+            }, 3000);
+        }
+
+        // Add slideOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideOut {
+                from { transform: translateX(-50%) translateY(0); opacity: 1; }
+                to { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // ============================================
+        // KEYBOARD SHORTCUTS
+        // ============================================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + N for home
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                window.location.href = '/';
+            }
+            
+            // Ctrl + D for dashboard
+            if (e.ctrlKey && e.key === 'd') {
+                e.preventDefault();
+                window.location.href = '/dashboard';
+            }
+            
+            // Ctrl + C for chatbot
+            if (e.ctrlKey && e.key === 'c') {
+                e.preventDefault();
+                window.location.href = '/chatbot';
+            }
+            
+            // Ctrl + P for profile
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.location.href = '/profile';
+            }
+            
+            // Ctrl + E for edit mode (focus on email input)
+            if (e.ctrlKey && e.key === 'e') {
+                e.preventDefault();
+                document.getElementById('emailInput').focus();
+            }
+            
+            // Ctrl + Shift + C to copy user ID
+            if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+                e.preventDefault();
+                copyUserId();
+            }
+            
+            // ? for help
+            if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                e.preventDefault();
+                showKeyboardHelp();
+            }
+            
+            // Esc to close help
+            if (e.key === 'Escape') {
+                const help = document.querySelector('.keyboard-help');
+                if (help) help.remove();
+            }
+            
+            // Ctrl + S to save (submit form)
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                document.getElementById('profileForm').submit();
+            }
+        });
+
+        function showKeyboardHelp() {
+            // Remove existing help
+            const existingHelp = document.querySelector('.keyboard-help');
+            if (existingHelp) existingHelp.remove();
+            
+            const help = document.createElement('div');
+            help.className = 'keyboard-help';
+            help.innerHTML = `
+                <h3>⌨️ Profile Shortcuts</h3>
+                <ul>
+                    <li><kbd>Ctrl</kbd> + <kbd>N</kbd> - Home</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Dashboard</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Chatbot</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>P</kbd> - Profile</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Edit mode</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>C</kbd> - Copy ID</li>
+                    <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - Save changes</li>
+                    <li><kbd>?</kbd> - Show help</li>
+                    <li><kbd>Esc</kbd> - Close</li>
+                </ul>
+            `;
+            document.body.appendChild(help);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (help.parentNode) help.remove();
+            }, 10000);
+        }
+
+        // ============================================
+        // FORM VALIDATION
+        // ============================================
+        function validateForm() {
+            const email = document.getElementById('emailInput').value;
+            const fullName = document.getElementById('fullNameInput').value;
+            
+            if (!email || !fullName) {
+                showFlashMessage('Please fill in all fields', 'error');
+                return false;
+            }
+            
+            if (!isValidEmail(email)) {
+                showFlashMessage('Please enter a valid email address', 'error');
+                return false;
+            }
+            
+            showLoading('Updating profile...');
+            return true;
+        }
+
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function showFlashMessage(message, type) {
+            const flash = document.createElement('div');
+            flash.className = `flash ${type}`;
+            flash.textContent = message;
+            flash.style.position = 'fixed';
+            flash.style.top = '20px';
+            flash.style.left = '50%';
+            flash.style.transform = 'translateX(-50%)';
+            flash.style.zIndex = '2000';
+            document.body.appendChild(flash);
+            
+            setTimeout(() => flash.remove(), 3000);
+        }
+
+        // ============================================
+        // LOADING ANIMATION
+        // ============================================
+        function showLoading(message = 'Processing...') {
+            const loader = document.createElement('div');
+            loader.className = 'custom-loader';
+            loader.innerHTML = `
+                <div class="loader-content">
+                    <div class="spinner"></div>
+                    <p>${message}</p>
+                    <div class="progress-bar" style="width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 20px; overflow: hidden;">
+                        <div class="progress-fill" style="height: 100%; background: var(--primary-color); animation: progress 2s ease infinite;"></div>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(loader);
+            
+            // Remove loader after 5 seconds (fallback)
+            setTimeout(() => {
+                if (loader.parentNode) loader.remove();
+            }, 5000);
+        }
+
+        // Add progress animation
+        const progressStyle = document.createElement('style');
+        progressStyle.textContent = `
+            @keyframes progress {
+                0% { width: 0%; }
+                50% { width: 100%; }
+                100% { width: 0%; }
+            }
+        `;
+        document.head.appendChild(progressStyle);
+
+        // ============================================
+        // PARTICLE EFFECT ON BUTTON CLICK
+        // ============================================
+        function createParticleEffect(event) {
+            const button = event.target;
+            const rect = button.getBoundingClientRect();
+            
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('span');
+                particle.className = 'particle';
+                particle.style.left = (Math.random() * rect.width) + 'px';
+                particle.style.top = (Math.random() * rect.height) + 'px';
+                particle.style.setProperty('--x', (Math.random() * 200 - 100) + 'px');
+                particle.style.setProperty('--y', (Math.random() * 200 - 100) + 'px');
+                particle.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                button.appendChild(particle);
+                
+                setTimeout(() => particle.remove(), 1000);
+            }
+        }
+
+        // ============================================
+        // REAL-TIME INPUT VALIDATION
+        // ============================================
+        document.getElementById('emailInput').addEventListener('input', function() {
+            if (this.value && !isValidEmail(this.value)) {
+                this.style.borderColor = 'var(--error-color)';
+            } else if (this.value) {
+                this.style.borderColor = 'var(--success-color)';
+            } else {
+                this.style.borderColor = 'transparent';
+            }
+        });
+
+        document.getElementById('fullNameInput').addEventListener('input', function() {
+            if (this.value.length < 2) {
+                this.style.borderColor = 'var(--error-color)';
+            } else {
+                this.style.borderColor = 'var(--success-color)';
+            }
+        });
+
+        // ============================================
+        // AVATAR ANIMATION ON HOVER
+        // ============================================
+        const avatar = document.getElementById('avatar');
+        avatar.addEventListener('mouseenter', function() {
+            this.style.animation = 'bounce 0.5s ease';
+        });
+        
+        avatar.addEventListener('animationend', function() {
+            this.style.animation = '';
+        });
+
+        // ============================================
+        // AUTO-SAVE FORM DATA (Local Storage)
+        // ============================================
+        const emailInput = document.getElementById('emailInput');
+        const fullNameInput = document.getElementById('fullNameInput');
+
+        // Load saved draft
+        const savedDraft = localStorage.getItem('profileDraft');
+        if (savedDraft) {
+            const draft = JSON.parse(savedDraft);
+            if (draft.email && !emailInput.value) emailInput.value = draft.email;
+            if (draft.fullName && !fullNameInput.value) fullNameInput.value = draft.fullName;
+        }
+
+        // Save draft on input
+        function saveDraft() {
+            const draft = {
+                email: emailInput.value,
+                fullName: fullNameInput.value,
+                timestamp: new Date().toISOString()
+            };
+            localStorage.setItem('profileDraft', JSON.stringify(draft));
+        }
+
+        emailInput.addEventListener('input', saveDraft);
+        fullNameInput.addEventListener('input', saveDraft);
+
+        // Clear draft on successful submit
+        document.getElementById('profileForm').addEventListener('submit', function() {
+            localStorage.removeItem('profileDraft');
+        });
+
+        // ============================================
+        // CONFETTI EFFECT ON PROFILE UPDATE
+        // ============================================
+        function showConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 },
+                    colors: ['#00d4ff', '#ffffff', '#00ff00']
+                });
+            }
+        }
+
+        // Trigger confetti if there's a success message
+        {% if get_flashed_messages(category_filter=['success']) %}
+            window.addEventListener('load', showConfetti);
+        {% endif %}
+
+        // ============================================
+        // WELCOME MESSAGE ANIMATION
+        // ============================================
+        window.addEventListener('load', function() {
+            // Animate profile elements
+            const elements = document.querySelectorAll('.info-item, .profile-header, .edit-form');
+            elements.forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+    </script>
+
+    <!-- Add confetti library for celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1"></script>
+</body>
+</html>

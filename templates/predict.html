@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Online Payments Fraud Detection - Result</title>
+    <style>
+        body {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+        }
+        .result-container {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); width: 500px; text-align: center;
+        }
+        h1 { color: #00d4ff; border-bottom: 1px solid rgba(0, 212, 255, 0.3); padding-bottom: 15px; margin-bottom: 25px; }
+        .prediction { font-size: 20px; margin-bottom: 30px; }
+        .highlight { color: black; font-weight: bold; background: rgba(255,255,255,0.9); padding: 10px 20px; border-radius: 4px; display: inline-block; }
+        .back-btn { display: inline-block; padding: 12px 25px; background: #00d4ff; color: black; text-decoration: none; font-weight: bold; border-radius: 5px; transition: 0.3s; margin-top: 20px; }
+        .back-btn:hover { background: #0099cc; }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <h1>FRAUD ANALYSIS RESULT</h1>
+        <p class="prediction">The predicted result for this online payment is:<br><br>
+        <span class="highlight">['{{ prediction_text }}']</span></p>
+        <a href="/" class="back-btn">RETURN TO HOMEPAGE</a>
+    </div>
+</body>
+</html>

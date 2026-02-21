@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login - Fraud Detection</title>
+    <style>
+        body {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1350&q=80');
+            background-size: cover; font-family: 'Segoe UI', sans-serif; color: white; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0;
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 40px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); width: 350px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        h2 { text-align: center; color: #00d4ff; text-transform: uppercase; letter-spacing: 2px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; background: rgba(255,255,255,0.9); box-sizing: border-box; }
+        button { width: 100%; padding: 14px; background: #00d4ff; border: none; color: black; font-weight: bold; border-radius: 5px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #0099cc; transform: translateY(-2px); }
+        .link { text-align: center; margin-top: 15px; }
+        .link a { color: #00d4ff; text-decoration: none; }
+        .link a:hover { text-decoration: underline; }
+        .flash { padding: 10px; margin-bottom: 15px; border-radius: 5px; }
+        .flash.success { background: rgba(0, 255, 0, 0.3); border: 1px solid green; }
+        .flash.error { background: rgba(255, 0, 0, 0.3); border: 1px solid red; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>LOGIN</h2>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <form method="POST">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="password" name="password" placeholder="Password" required>
+            <button type="submit">LOGIN</button>
+        </form>
+        
+        <div class="link">
+            Don't have an account? <a href="/register">Register here</a>
+        </div>
+        <div class="link">
+            <a href="/">Back to Home</a>
+        </div>
+    </div>
+</body>
+</html>
